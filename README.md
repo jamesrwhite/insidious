@@ -1,18 +1,17 @@
-# Insidious
+Insidious [![Gem Version](http://img.shields.io/gem/v/insidious.svg)](https://rubygems.org/gems/insidious) [![Code Climate](http://img.shields.io/codeclimate/github/jamesrwhite/insidious.svg)](https://codeclimate.com/github/jamesrwhite/insidious)
+----------
 
 A simple and flexible ruby gem for managing daemons.
 
-## Usage
+### Usage
 
-Coming Soon
+Coming soon but for now check out [examples/insidious.rb](https://github.com/jamesrwhite/insidious/blob/master/examples/insidious.rb).
 
-Credit
--------
+### Credit
 
 insidious is a fork of [fallen](https://github.com/inkel/fallen) by [@inkel](https://github.com/inkel) and a lot of credit for this goes to him.
 
-License
----------
+### License
 
 The MIT License (MIT)
 
