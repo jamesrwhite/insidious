@@ -4,7 +4,7 @@ A simple and flexible ruby gem for managing daemons.
 
 ## Usage
 
-Coming Soon
+Coming soon but for now check out [examples/insidious.rb](https://github.com/jamesrwhite/insidious/blob/master/examples/insidious.rb)
 
 Credit
 -------
