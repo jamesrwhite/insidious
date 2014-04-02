@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |spec|
   spec.name        = 'insidious'
-  spec.version     = '0.1.1'
+  spec.version     = '0.1.2'
   spec.summary     = 'A simple and flexible ruby gem for managing daemons.'
   spec.authors     = ['James White']
   spec.email       = ['dev.jameswhite@gmail.com']
