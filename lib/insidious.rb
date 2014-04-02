@@ -84,7 +84,10 @@ class Insidious
 
   # Restarts the daemon
   def restart!(&block)
-    stop!
+    if running?
+      stop!
+    end
+
     start!(&block)
   end
 
