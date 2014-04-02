@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
   spec.homepage    = 'https://github.com/jamesrwhite/insidious'
   spec.license     = 'MIT'
 
-  spec.required_ruby_version = '>= 1.9.3g'
+  spec.required_ruby_version = '>= 1.9.3'
 
   spec.require_paths = ['lib']
   spec.files         = Dir['Rakefile', 'README.md', 'LICENSE', '{lib,spec}/**/*']
