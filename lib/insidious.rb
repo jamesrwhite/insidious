@@ -1,3 +1,5 @@
+require 'error'
+
 class Insidious
   attr_accessor :pid_file
   attr_accessor :pid
@@ -45,17 +47,12 @@ class Insidious
   # is already running, in which case insidious will exit with an error
   # code.
   def start!(&block)
-    if pid_file && File.exists?(pid_file)
-      begin
-        Process.kill(0, pid)
-        STDERR.puts("Daemon is already running with PID #{pid}")
-        exit 2
-      rescue Errno::ESRCH
-        run!(&block)
-      end
+    if running?
+      fail InsidiousError.new("Process is already running with PID #{pid}")
+      exit 2
     else
-      if (pid_file.nil? && daemonize)
-        STDERR.puts('No PID file is set but daemonize is set to true')
+      if pid_file.nil? && daemonize
+        fail InsidiousError.new('No PID file is set but daemonize is set to true')
         exit 1
       end
 
@@ -73,11 +70,11 @@ class Insidious
         Process.kill(:INT, pid)
         File.delete(pid_file)
       rescue Errno::ESRCH
-        STDERR.puts("No daemon is running with PID #{pid}")
+        fail InsidiousError.new("No process is running with PID #{pid}")
         exit 3
       end
     else
-      STDERR.puts("Couldn't find the PID file: '#{pid_file}'")
+      fail InsidiousError.new("Couldn't find the PID file: '#{pid_file}'")
       exit 1
     end
   end

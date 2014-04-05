@@ -1,0 +1,2 @@
+class InsidiousError < StandardError
+end
