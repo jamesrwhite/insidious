@@ -1,37 +1,12 @@
 require 'error'
 
 class Insidious
-  attr_reader   :pid
-  attr_accessor :pid_file
+  attr_reader :pid_file
 
+  # Intiailise Insidious, note the correct spelling of initialise.
   def initialize(options = {})
     @daemonize = options[:daemonize].nil? ? true : options[:daemonize]
-    @pid_file = options[:pid_file]
-  end
-
-  # Runs the daemon
-  #
-  # This will set up `INT` & `TERM` signal handlers to stop execution
-  # properly. When this signal handlers are called it will also call
-  # the #interrupt method and delete the pid file
-  def run!(&block)
-    begin
-      if @daemonize
-        Process.daemon(true)
-      end
-
-      save_pid_file
-
-      block.call
-    rescue Interrupt, SignalException
-      interrupt
-    end
-  end
-
-  # Handles an interrupt (`SIGINT` or `SIGTERM`) properly as it
-  # deletes the pid file and calles the `stop` method.
-  def interrupt
-    File.delete(pid_file) if pid_file && File.exists?(pid_file)
+    @pid_file = options[:pid_file].nil? ? nil : File.absolute_path(options[:pid_file])
   end
 
   # Starts the daemon
@@ -45,12 +20,12 @@ class Insidious
       fail InsidiousError.new("Process is already running with PID #{pid}")
       exit 2
     else
-      if pid_file.nil? && daemonize
+      if @pid_file.nil? && daemon?
         fail InsidiousError.new('No PID file is set but daemonize is set to true')
         exit 1
       end
 
-      run!(&block)
+      run_daemon!(&block)
     end
   end
 
@@ -59,41 +34,35 @@ class Insidious
   # This method only works when a PID file is given, otherwise it will
   # exit with an error.
   def stop!
-    if pid_file && File.exists?(pid_file)
+    if @pid_file && File.exists?(@pid_file)
       begin
         Process.kill(:INT, pid)
-        File.delete(pid_file)
+        File.delete(@pid_file)
       rescue Errno::ESRCH
         fail InsidiousError.new("No process is running with PID #{pid}")
         exit 3
       end
     else
-      fail InsidiousError.new("Couldn't find the PID file: '#{pid_file}'")
+      fail InsidiousError.new("Couldn't find the PID file: '#{@pid_file}'")
       exit 1
     end
   end
 
-  # Restarts the daemon
+  # Restarts the daemon, just a convenience method really
   def restart!(&block)
-    if running?
-      stop!
-    end
-
+    stop! if running?
     start!(&block)
   end
 
-  # Get the pid from the pid_file
-  def pid
-    File.read(@pid_file).strip.to_i
-  end
-
-  # Returns `true` if the daemon is running
+  # Returns true if the daemon is running
   def running?
     # First check if we have a pid file and if it exists
-    if pid_file.nil? || !File.exists?(pid_file)
-      return false
-    end
+    return false if @pid_file.nil? || !File.exists?(@pid_file)
 
+    # Then make sure we have a pid
+    return false if pid.nil?
+
+    # If we can get the process id then we assume it is running
     begin
       Process.getpgid(pid)
       true
@@ -107,17 +76,45 @@ class Insidious
     @daemonize
   end
 
-  # Set the path where the PID file will be created/read from
-  def pid_file=(path)
-    @pid_file = File.absolute_path(path)
+  # Get the pid from the pid_file
+  # TODO: should this be 'cached'?
+  def pid
+    File.read(@pid_file).strip.to_i
+  end
+
+  # Save the PID to the PID file specified in @pid_file
+  def pid=(pid)
+    File.open(@pid_file, 'w') do |file|
+      file.write(pid)
+    end if @pid_file
   end
 
   private
 
-  # Save the falen angel PID to the PID file specified in `pid_file`
-  def save_pid_file
-    File.open(pid_file, 'w') do |fp|
-      fp.write(Process.pid)
-    end if pid_file
+  # Runs the daemon
+  #
+  # This will set up `INT` & `TERM` signal handlers to stop execution
+  # properly. When this signal handlers are called it will also call
+  # the #interrupt method and delete the pid file
+  def run_daemon!(&block)
+    begin
+      # Only start the process as a daemon if requested
+      Process.daemon(true) if daemon?
+
+      # Set the process id, this will save it to @pid_file
+      self.pid = Process.pid
+
+      # Call the block of code passed to us
+      block.call
+    # Handle interruptipns such as someone ctrl-c or killing the process
+    rescue Interrupt, SignalException
+      interrupt!
+    end
+  end
+
+  # Handle an interrupt (`SIGINT` or `SIGTERM`) by deleting the
+  # pid file if it exists
+  def interrupt!
+    File.delete(@pid_file) if @pid_file && File.exists?(@pid_file)
   end
 end
