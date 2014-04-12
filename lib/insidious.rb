@@ -1,8 +1,8 @@
 require 'error'
 
 class Insidious
+  attr_reader   :pid
   attr_accessor :pid_file
-  attr_accessor :pid
   attr_accessor :stdin
   attr_accessor :stdout
   attr_accessor :stderr
