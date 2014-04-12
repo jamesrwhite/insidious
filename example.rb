@@ -1,6 +1,9 @@
-require_relative '../lib/insidious'
+require_relative 'lib/insidious'
 
-insidious = Insidious.new(:pid_file => '/tmp/insidious.pid')
+insidious = Insidious.new(
+  :pid_file => '/tmp/insidious.pid',
+  # :daemonize => false
+)
 
 def app
   while true
