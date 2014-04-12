@@ -3,16 +3,10 @@ require 'error'
 class Insidious
   attr_reader   :pid
   attr_accessor :pid_file
-  attr_accessor :stdin
-  attr_accessor :stdout
-  attr_accessor :stderr
 
   def initialize(options = {})
     @daemonize = options[:daemonize].nil? ? true : options[:daemonize]
     @pid_file = options[:pid_file]
-    @stdin = options[:stdin]
-    @stdout = options[:stdout]
-    @stderr = options[:stderr]
   end
 
   # Runs the daemon
@@ -23,7 +17,7 @@ class Insidious
   def run!(&block)
     begin
       if @daemonize
-        Process.daemon(true, (stdin || stdout || stderr))
+        Process.daemon(true)
       end
 
       save_pid_file
@@ -113,46 +107,9 @@ class Insidious
     @daemonize
   end
 
-  # Changes the working directory
-  #
-  # All paths will be relative to the working directory unless they're
-  # specified as absolute paths.
-  #
-  # @param [String] path of the new workng directory
-  def chdir!(path)
-    Dir.chdir(File.absolute_path(path))
-  end
-
-  # Set the path where the PID file will be created
+  # Set the path where the PID file will be created/read from
   def pid_file=(path)
     @pid_file = File.absolute_path(path)
-  end
-
-  # Reopens `STDIN` for reading from `path`
-  #
-  # This path is relative to the working directory unless an absolute
-  # path is given.
-  def stdin=(path)
-    @stdin = File.absolute_path(path)
-    STDIN.reopen(@stdin)
-  end
-
-  # Reopens `STDOUT` for writing to `path`
-  #
-  # This path is relative to the working directory unless an absolute
-  # path is given.
-  def stdout=(path)
-    @stdout = File.absolute_path(path)
-    STDOUT.reopen(@stdout, 'a')
-  end
-
-  # Reopens `STDERR` for writing to `path`
-  #
-  # This path is relative to the working directory unless an absolute
-  # path is given.
-  def stderr=(path)
-    @stderr = File.absolute_path(path)
-    STDERR.reopen(stderr, 'a')
   end
 
   private
