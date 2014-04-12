@@ -3,9 +3,71 @@ Insidious [![Gem Version](http://img.shields.io/gem/v/insidious.svg)](https://ru
 
 A simple and flexible ruby gem for managing daemons.
 
-### Usage
+### Configuration
 
-Coming soon but for now check out [examples/insidious.rb](https://github.com/jamesrwhite/insidious/blob/master/examples/insidious.rb).
+````ruby
+insidious = new Insidious(
+  :pid_file => '/path/where/the/pid/will/be/saved',
+  :daemonize => true, # can be true or false but defaults to being true
+)
+````
+
+### Start a daemon
+
+````ruby
+insidious = Insidious.new(:pid_file => '/tmp/insidious.pid')
+
+insidious.start! do
+  while true
+    puts Time.now.utc
+    sleep 1
+  end
+end
+````
+
+### Stop a daemon
+
+````ruby
+insidious = Insidious.new(:pid_file => '/tmp/insidious.pid')
+
+insidious.start! { your_app }
+
+insidious.stop!
+````
+
+### Restart a daemon
+
+````ruby
+insidious = Insidious.new(:pid_file => '/tmp/insidious.pid')
+
+insidious.start! { your_app }
+
+insidious.restart! { your_app }
+````
+
+### Check the status of a daemon
+
+````ruby
+insidious = Insidious.new(:pid_file => '/tmp/insidious.pid')
+
+insidious.start! { your_app }
+
+insidious.running? # => true
+
+insidious.stop!
+
+insidious.running? # => false
+````
+
+### Get the process id of a daemon
+
+````ruby
+insidious = Insidious.new(:pid_file => '/tmp/insidious.pid')
+
+insidious.start! { your_app }
+
+insidious.pid # This will read from /tmp/insidious.pid
+````
 
 ### Credit
 
