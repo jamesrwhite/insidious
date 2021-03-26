@@ -1,7 +1,25 @@
-Insidious [![Gem Version](http://img.shields.io/gem/v/insidious.svg)](https://rubygems.org/gems/insidious) [![Code Climate](http://img.shields.io/codeclimate/github/jamesrwhite/insidious.svg)](https://codeclimate.com/github/jamesrwhite/insidious)
+😈 Insidious
 ----------
 
 A simple and flexible ruby gem for managing daemons.
+
+## Installation
+
+Insidious is available on [RubyGems](https://rubygems.org/gems/insidious).
+
+Install it manually:
+
+```bash
+gem install insidious
+```
+
+Or add it to your `Gemfile`:
+
+```ruby
+gem 'insidious', '~> 0.3'
+```
+
+## Usage
 
 ### Configuration
 
